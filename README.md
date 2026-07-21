@@ -404,7 +404,8 @@ Start it with:
 npm run start:dev
 ```
 
-It binds to `127.0.0.1:3000` by default:
+It binds to `0.0.0.0:3000` by default so it can run in container platforms such
+as Fly.io. Set `PORT` when the platform provides a different internal port:
 
 ```bash
 curl http://127.0.0.1:3000/v1/health
