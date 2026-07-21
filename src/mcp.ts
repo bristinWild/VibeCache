@@ -5,6 +5,8 @@ import { CliAppModule } from './cli-app.module';
 import { CAPSULE_REGISTRY_PORT } from './core/ports/capsule-registry.port';
 import type { CapsuleRegistryPort } from './core/ports/capsule-registry.port';
 import { PlanFeatureUseCase } from './core/use-cases/plan-feature.use-case';
+import { VIBECACHE_VERSION } from './version';
+import { loadMarketplaceIndex } from './marketplace/marketplace-index';
 
 type JsonRpcRequest = {
   jsonrpc?: string;
@@ -36,6 +38,23 @@ const TOOL = {
       },
     },
     required: ['request'],
+    additionalProperties: false,
+  },
+};
+
+const CATALOG_TOOL = {
+  name: 'vibe_catalog',
+  description:
+    'List approved VibeCache community capsules by category or search term.',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      category: { type: 'string', description: 'Optional category filter.' },
+      search: {
+        type: 'string',
+        description: 'Optional id/category search term.',
+      },
+    },
     additionalProperties: false,
   },
 };
@@ -115,14 +134,14 @@ async function handleLine(
       response(message.id, {
         protocolVersion: '2024-11-05',
         capabilities: { tools: {} },
-        serverInfo: { name: 'vibecache', version: '0.1.0' },
+        serverInfo: { name: 'vibecache', version: VIBECACHE_VERSION },
       }),
     );
     return;
   }
 
   if (message.method === 'tools/list') {
-    writeMessage(response(message.id, { tools: [TOOL] }));
+    writeMessage(response(message.id, { tools: [TOOL, CATALOG_TOOL] }));
     return;
   }
 
@@ -132,6 +151,28 @@ async function handleLine(
   }
 
   const params = message.params ?? {};
+  if (params.name === CATALOG_TOOL.name) {
+    const args = (params.arguments ?? {}) as Record<string, unknown>;
+    const category =
+      typeof args.category === 'string' ? args.category.toLowerCase() : '';
+    const search =
+      typeof args.search === 'string' ? args.search.toLowerCase() : '';
+    const entries = loadMarketplaceIndex().filter((entry) => {
+      const categoryMatches = !category || entry.category === category;
+      const searchMatches =
+        !search ||
+        [entry.id, entry.category, entry.publisher].some((value) =>
+          value.toLowerCase().includes(search),
+        );
+      return categoryMatches && searchMatches;
+    });
+    writeMessage(
+      response(message.id, {
+        content: [{ type: 'text', text: JSON.stringify(entries, null, 2) }],
+      }),
+    );
+    return;
+  }
   if (params.name !== TOOL.name) {
     writeMessage(
       errorResponse(

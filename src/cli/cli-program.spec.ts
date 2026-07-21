@@ -66,6 +66,7 @@ describe('createCli', () => {
       'list',
       'inspect',
       'mcp',
+      'marketplace',
       'add',
     ]);
   });

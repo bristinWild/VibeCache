@@ -1,6 +1,7 @@
 schemaVersion: 1
 id: sdk-feature
 version: 0.1.0
+category: sdk
 name: Public SDK feature
 summary: Adds a maintainable TypeScript SDK capability while preserving its package boundary and documentation.
 

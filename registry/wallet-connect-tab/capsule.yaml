@@ -1,6 +1,7 @@
 schemaVersion: 1
 id: wallet-connect-tab
 version: 0.1.0
+category: frontend
 name: WalletConnect tab
 summary: Adds a secure WalletConnect entry point to an existing TypeScript web project.
 

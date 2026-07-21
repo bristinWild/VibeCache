@@ -5,6 +5,17 @@ const IdentifierSchema = z
   .min(1)
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 
+export const CapsuleCategorySchema = z.enum([
+  'general',
+  'frontend',
+  'backend',
+  'sdk',
+  'cli',
+  'mcp',
+  'data',
+  'devops',
+]);
+
 const CompatibilityRequirementSchema = z.object({
   dimension: z.enum(['framework', 'auth', 'orm', 'database', 'deployment']),
   oneOf: z.array(IdentifierSchema).min(1),
@@ -48,6 +59,7 @@ export const CapsuleSchema = z
     schemaVersion: z.literal(1),
     id: IdentifierSchema,
     version: z.string().regex(/^\d+\.\d+\.\d+$/),
+    category: CapsuleCategorySchema.default('general'),
     name: z.string().min(1),
     summary: z.string().min(1),
     provides: z.array(IdentifierSchema).min(1),

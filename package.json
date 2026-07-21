@@ -1,6 +1,6 @@
 {
   "name": "vibecache",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Compile and safely execute verified feature capsules against Cliper repository memory.",
   "author": "Bristin Borah",
   "license": "MIT",
@@ -33,6 +33,7 @@
     "dist/**/*.d.ts",
     "dist/**/*.js.map",
     "registry",
+    "marketplace",
     "README.md"
   ],
   "bin": {
@@ -50,6 +51,7 @@
     "start:dev": "nest start --watch",
     "start:cli": "ts-node src/cli.ts",
     "start:mcp": "ts-node src/mcp.ts",
+    "marketplace:validate": "ts-node src/marketplace/validate-marketplace.ts",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,test}/**/*.ts\"",

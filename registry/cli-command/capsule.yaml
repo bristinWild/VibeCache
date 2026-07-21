@@ -1,0 +1,51 @@
+schemaVersion: 1
+id: cli-command
+version: 0.1.0
+category: cli
+name: CLI command
+summary: Adds a safe, documented command to an existing TypeScript CLI.
+provides:
+  - cli-command
+  - cli-documentation
+requires:
+  - capability: typescript-source
+  - capability: buildable
+tasks:
+  - id: map-cli-boundary
+    title: Map the CLI boundary
+    instructions:
+      - Read Cliper memory and verify the command parser, service boundaries, output conventions, and error handling.
+    targets:
+      - source-root
+    creates:
+      - cli-command-boundary
+  - id: implement-cli-command
+    title: Implement the command
+    instructions:
+      - Add the command using existing parser and dependency conventions.
+      - Validate arguments, keep output deterministic, and avoid destructive defaults.
+      - Add help text and focused tests when the repository has a test convention.
+    dependsOn:
+      - map-cli-boundary
+    targets:
+      - source-root
+    creates:
+      - cli-command
+  - id: verify-cli-command
+    title: Verify and document the command
+    instructions:
+      - Update command documentation and run the existing build and test checks.
+    dependsOn:
+      - implement-cli-command
+    targets:
+      - source-root
+    creates:
+      - cli-acceptance-tests
+    verification:
+      - id: project-build
+        executable: npm
+        args: [run, build]
+acceptance:
+  - id: cli-build
+    executable: npm
+    args: [run, build]

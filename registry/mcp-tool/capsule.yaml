@@ -1,0 +1,53 @@
+schemaVersion: 1
+id: mcp-tool
+version: 0.1.0
+category: mcp
+name: MCP tool
+summary: Adds a safe, schema-defined MCP tool to an existing MCP server.
+provides:
+  - mcp-tool
+  - mcp-schema
+requires:
+  - capability: typescript-source
+  - capability: buildable
+tasks:
+  - id: map-mcp-server
+    title: Map the MCP server
+    instructions:
+      - Read Cliper memory and verify the MCP transport, tool registration, schemas, and error conventions.
+    targets:
+      - source-root
+    creates:
+      - mcp-tool-boundary
+  - id: implement-mcp-tool
+    title: Implement the MCP tool
+    instructions:
+      - Add a narrowly scoped tool with a strict input schema and clear description.
+      - Keep untrusted tool arguments separate from system instructions and avoid hidden side effects.
+      - Return actionable structured errors and add focused protocol tests when possible.
+    dependsOn:
+      - map-mcp-server
+    targets:
+      - source-root
+    creates:
+      - mcp-tool
+      - mcp-input-schema
+  - id: verify-mcp-tool
+    title: Verify the MCP tool
+    instructions:
+      - Exercise initialize, tool discovery, valid calls, invalid calls, and transport shutdown.
+      - Run the existing build and test checks.
+    dependsOn:
+      - implement-mcp-tool
+    targets:
+      - source-root
+    creates:
+      - mcp-protocol-tests
+    verification:
+      - id: project-build
+        executable: npm
+        args: [run, build]
+acceptance:
+  - id: mcp-build
+    executable: npm
+    args: [run, build]

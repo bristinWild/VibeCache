@@ -96,6 +96,34 @@ Register the `vibe-mcp` command in Codex's MCP settings, then restart Codex so
 the tool is discovered. The MCP server uses the current project directory by
 default; it can also receive an explicit `repositoryPath`.
 
+## Capsule catalog
+
+Capsules are grouped by project category and can be listed with:
+
+```bash
+vibe list --category frontend
+vibe list --category backend
+vibe list --category sdk
+vibe list --category cli
+vibe list --category mcp
+```
+
+The initial catalog includes dark themes and wallet navigation for frontend
+projects, API endpoints and billing for backend projects, public SDK features,
+CLI commands, and MCP tools. Each capsule is a focused capability with its own
+grounding requirements and verification steps.
+
+Community authors submit capsules through pull requests. The repository checks
+schema validity, registry/index alignment, tests, lint, and build before a
+maintainer approves the entry:
+
+```bash
+npm run marketplace:validate
+```
+
+See [`marketplace/CONTRIBUTING.md`](marketplace/CONTRIBUTING.md) for the review
+checklist and safety requirements.
+
 ## Prerequisites
 
 The complete workflow uses:

@@ -13,6 +13,8 @@ import type {
   PlanFeatureUseCase,
 } from '../core/use-cases/plan-feature.use-case';
 import type { ConfirmationPrompt } from './terminal-confirmation';
+import { VIBECACHE_VERSION } from '../version';
+import { loadMarketplaceIndex } from '../marketplace/marketplace-index';
 
 export interface CliServices {
   inspectProject: Pick<InspectProjectUseCase, 'execute'>;
@@ -48,7 +50,7 @@ export function createCli(
     .description(
       'Compile reusable feature capsules against Cliper repository memory.',
     )
-    .version('0.1.0')
+    .version(VIBECACHE_VERSION)
     .configureOutput({
       writeOut: (value) => io.out(value),
       writeErr: (value) => io.err(value),
@@ -170,8 +172,12 @@ export function createCli(
     .command('list')
     .description('List locally available feature capsules.')
     .option('--json', 'Print machine-readable JSON.')
-    .action(async (options: { json?: boolean }) => {
-      const capsules = await services.registry.list();
+    .option('--category <category>', 'Filter by capsule category.')
+    .action(async (options: { json?: boolean; category?: string }) => {
+      const allCapsules = await services.registry.list();
+      const capsules = options.category
+        ? allCapsules.filter((capsule) => capsule.category === options.category)
+        : allCapsules;
       if (options.json) {
         writeJson(io, capsules);
         return;
@@ -182,7 +188,9 @@ export function createCli(
         return;
       }
       for (const capsule of capsules) {
-        io.out(`${capsule.id}@${capsule.version}  ${capsule.name}\n`);
+        io.out(
+          `${capsule.id}@${capsule.version}  [${capsule.category}]  ${capsule.name}\n`,
+        );
       }
     });
 
@@ -226,6 +234,37 @@ export function createCli(
           '',
         ].join('\n'),
       );
+    });
+
+  const marketplace = program
+    .command('marketplace')
+    .description('Browse approved community capsules.');
+  marketplace
+    .command('list')
+    .option('--category <category>', 'Filter by category.')
+    .action((options: { category?: string }) => {
+      const entries = loadMarketplaceIndex().filter(
+        (entry) => !options.category || entry.category === options.category,
+      );
+      for (const entry of entries) {
+        io.out(
+          `${entry.id}@${entry.version}  [${entry.category}]  approved by ${entry.publisher}\n`,
+        );
+      }
+    });
+  marketplace
+    .command('search')
+    .argument('<term>', 'Search capsule id, category, or publisher.')
+    .action((term: string) => {
+      const query = term.toLowerCase();
+      const entries = loadMarketplaceIndex().filter((entry) =>
+        [entry.id, entry.category, entry.publisher].some((value) =>
+          value.toLowerCase().includes(query),
+        ),
+      );
+      for (const entry of entries) {
+        io.out(`${entry.id}@${entry.version}  [${entry.category}]\n`);
+      }
     });
 
   program

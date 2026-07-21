@@ -1,6 +1,7 @@
 schemaVersion: 1
 id: dark-theme
 version: 0.1.0
+category: frontend
 name: Dark theme
 summary: Adds an accessible, persistent dark theme to an existing TypeScript web project.
 

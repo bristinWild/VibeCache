@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "catalog": "vibecache-approved-capsules",
+  "updatedAt": "2026-07-21T00:00:00.000Z",
+  "entries": [
+    { "id": "api-endpoint", "version": "0.1.0", "category": "backend", "status": "approved", "publisher": "vibecache-core" },
+    { "id": "cli-command", "version": "0.1.0", "category": "cli", "status": "approved", "publisher": "vibecache-core" },
+    { "id": "dark-theme", "version": "0.1.0", "category": "frontend", "status": "approved", "publisher": "vibecache-core" },
+    { "id": "mcp-tool", "version": "0.1.0", "category": "mcp", "status": "approved", "publisher": "vibecache-core" },
+    { "id": "sdk-feature", "version": "0.1.0", "category": "sdk", "status": "approved", "publisher": "vibecache-core" },
+    { "id": "stripe-subscriptions", "version": "0.1.0", "category": "backend", "status": "approved", "publisher": "vibecache-core" },
+    { "id": "wallet-connect-tab", "version": "0.1.0", "category": "frontend", "status": "approved", "publisher": "vibecache-core" }
+  ]
+}

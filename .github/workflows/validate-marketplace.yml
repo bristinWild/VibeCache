@@ -1,0 +1,26 @@
+name: Validate marketplace
+
+on:
+  pull_request:
+    paths:
+      - 'registry/**'
+      - 'marketplace/**'
+      - 'src/core/domain/capsule.ts'
+      - 'src/marketplace/**'
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run marketplace:validate
+      - run: npm test -- --runInBand
+      - run: npm run lint
+      - run: npm run build

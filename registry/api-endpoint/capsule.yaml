@@ -1,0 +1,53 @@
+schemaVersion: 1
+id: api-endpoint
+version: 0.1.0
+category: backend
+name: API endpoint
+summary: Adds a validated, observable API endpoint using the repository's existing server conventions.
+provides:
+  - api-endpoint
+  - api-validation
+requires:
+  - capability: typescript-source
+  - capability: buildable
+tasks:
+  - id: map-server-boundary
+    title: Map the server boundary
+    instructions:
+      - Read Cliper memory and verify the existing server, routing, validation, and error-handling conventions.
+      - Identify the narrowest existing module that should own the endpoint.
+    targets:
+      - source-root
+    creates:
+      - server-module
+  - id: implement-endpoint
+    title: Implement the endpoint
+    instructions:
+      - Add the endpoint using existing routing and dependency conventions.
+      - Validate untrusted input and return consistent success and error responses.
+      - Keep secrets server-side and add focused tests when a test convention exists.
+    dependsOn:
+      - map-server-boundary
+    targets:
+      - source-root
+    creates:
+      - api-route
+      - api-validation
+  - id: verify-endpoint
+    title: Verify the endpoint
+    instructions:
+      - Run the repository's existing build and test checks and document any unresolved risks.
+    dependsOn:
+      - implement-endpoint
+    targets:
+      - source-root
+    creates:
+      - api-acceptance-tests
+    verification:
+      - id: project-build
+        executable: npm
+        args: [run, build]
+acceptance:
+  - id: backend-build
+    executable: npm
+    args: [run, build]

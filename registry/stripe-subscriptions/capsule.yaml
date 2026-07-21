@@ -1,6 +1,7 @@
 schemaVersion: 1
 id: stripe-subscriptions
 version: 0.1.0
+category: backend
 name: Stripe subscriptions
 summary: Adds recurring Stripe billing and subscription-backed entitlements to an existing application.
 
