@@ -8,3 +8,9 @@ coverage/
 *.log
 .vibe/runs/
 .vibe/locks/
+
+# Cliper — auto-managed
+package-lock.json
+.cliper/cache/
+.cliper/prompt-*.md
+.cliper

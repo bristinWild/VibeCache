@@ -1,4 +1,5 @@
 import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
+import { homedir } from 'node:os';
 import { resolve } from 'node:path';
 import { CliperMemoryError } from '../adapters/cliper/cliper-memory.errors';
 import { InspectProjectUseCase } from '../core/use-cases/inspect-project.use-case';
@@ -16,7 +17,12 @@ export class ProjectsController {
     const repositoryPath = resolveRequestPath(body);
 
     try {
-      return await this.inspectProject.execute(repositoryPath);
+      const inspectDetailed = this.inspectProject as InspectProjectUseCase & {
+        executeDetailed?: (path: string) => Promise<unknown>;
+      };
+      return inspectDetailed.executeDetailed
+        ? await inspectDetailed.executeDetailed(repositoryPath)
+        : await this.inspectProject.execute(repositoryPath);
     } catch (error) {
       if (error instanceof CliperMemoryError) {
         throw new BadRequestException({
@@ -38,5 +44,9 @@ function resolveRequestPath(body: InspectProjectRequest | null): string {
     });
   }
 
-  return resolve(requestPath ?? process.cwd());
+  return resolve(expandHome(requestPath ?? process.cwd()));
+}
+
+function expandHome(path: string): string {
+  return path === '~' ? homedir() : path.startsWith('~/') ? `${homedir()}/${path.slice(2)}` : path;
 }

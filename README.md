@@ -393,9 +393,10 @@ integration.
 
 ## Local HTTP API
 
-The local API is an optional integration surface for health, inspection, and
-planning. The CLI does not require the server, and the API does not currently
-execute agents, list runs, or resume runs.
+The local API is an optional integration surface for health, inspection,
+marketplace browsing, and planning. The CLI does not require the server, and
+The API can generate dry-run plans and execute a confirmed plan, but it does
+not currently list runs or resume runs.
 
 Start it with:
 
@@ -408,6 +409,10 @@ It binds to `127.0.0.1:3000` by default:
 ```bash
 curl http://127.0.0.1:3000/v1/health
 
+curl http://127.0.0.1:3000/v1/capsules
+
+curl http://127.0.0.1:3000/v1/capsules/dark-theme
+
 curl -X POST http://127.0.0.1:3000/v1/projects/inspect \
   -H 'content-type: application/json' \
   -d '{"path":"/absolute/path/to/my-app"}'
@@ -415,6 +420,10 @@ curl -X POST http://127.0.0.1:3000/v1/projects/inspect \
 curl -X POST http://127.0.0.1:3000/v1/capsules/stripe-subscriptions/plan \
   -H 'content-type: application/json' \
   -d '{"path":"/absolute/path/to/my-app"}'
+
+curl -X POST http://127.0.0.1:3000/v1/capsules/stripe-subscriptions/execute \
+  -H 'content-type: application/json' \
+  -d '{"path":"/absolute/path/to/my-app","allowDirty":false}'
 ```
 
 ## Project structure
