@@ -1,0 +1,11 @@
+{
+  "id": "package:@supabase/supabase-js",
+  "type": "package",
+  "title": "@supabase/supabase-js",
+  "content": "Supabase JavaScript client used for repository authentication.",
+  "metadata": {
+    "package": "@supabase/supabase-js"
+  },
+  "tags": ["package", "authentication", "supabase"],
+  "relationships": ["file:src/lib/supabase/server.ts"]
+}

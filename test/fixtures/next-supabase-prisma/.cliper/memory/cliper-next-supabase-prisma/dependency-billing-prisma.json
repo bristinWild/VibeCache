@@ -1,0 +1,15 @@
+{
+  "id": "src/app/api/billing/route.ts->src/lib/prisma.ts",
+  "type": "dependency",
+  "title": "Billing route imports Prisma client",
+  "content": "src/app/api/billing/route.ts imports src/lib/prisma.ts for subscription database access.",
+  "metadata": {
+    "from": "src/app/api/billing/route.ts",
+    "to": "src/lib/prisma.ts"
+  },
+  "tags": ["dependency", "database", "prisma"],
+  "relationships": [
+    "file:src/app/api/billing/route.ts",
+    "file:src/lib/prisma.ts"
+  ]
+}

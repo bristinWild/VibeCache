@@ -1,0 +1,12 @@
+{
+  "id": "file:src/app/api/billing/route.ts",
+  "type": "file",
+  "title": "src/app/api/billing/route.ts",
+  "content": "Authenticated Next.js route handler for subscription billing data.",
+  "metadata": {
+    "path": "src/app/api/billing/route.ts",
+    "role": "server-route"
+  },
+  "tags": ["nextjs", "billing", "route-handler"],
+  "relationships": ["file:src/lib/supabase/server.ts", "file:src/lib/prisma.ts"]
+}

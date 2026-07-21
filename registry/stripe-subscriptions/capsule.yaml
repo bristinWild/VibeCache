@@ -1,0 +1,133 @@
+schemaVersion: 1
+id: stripe-subscriptions
+version: 0.1.0
+name: Stripe subscriptions
+summary: Adds recurring Stripe billing and subscription-backed entitlements to an existing application.
+
+provides:
+  - subscription-billing
+  - subscription-entitlements
+
+compatibility:
+  - dimension: framework
+    oneOf:
+      - nextjs-app-router
+  - dimension: auth
+    oneOf:
+      - supabase
+  - dimension: orm
+    oneOf:
+      - prisma
+
+requires:
+  - capability: user-identity
+  - capability: persistent-database
+  - capability: server-routes
+
+questions:
+  - id: cancellation-behavior
+    prompt: When should paid access end after a customer cancels?
+    type: select
+    options:
+      - end-of-period
+      - immediately
+    default: end-of-period
+
+tasks:
+  - id: subscription-schema
+    title: Add Stripe foundations and the subscription data model
+    instructions:
+      - Install the Stripe server SDK with the repository's existing package manager if it is not already present.
+      - Ensure the matching Prisma CLI is installed locally as a development dependency when the repository does not already provide it; verification must not download tools dynamically.
+      - Add a server-only Stripe client that never exposes the secret key to browser code.
+      - Add validated configuration and example environment entries for STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, and the allowed recurring price identifier without writing real secrets.
+      - Add a Prisma subscription model linked to the existing application user identity.
+      - Store Stripe customer, subscription, price, status, and current-period fields needed for entitlement checks.
+      - Generate a database migration without replacing or weakening existing user constraints.
+      - Document the external Stripe product, price, webhook endpoint, and deployment environment setup required to operate the feature.
+    targets:
+      - database-schema
+    creates:
+      - subscription-model
+      - stripe-server-client
+      - billing-configuration
+    verification:
+      - id: validate-schema
+        executable: ./node_modules/.bin/prisma
+        args:
+          - validate
+
+  - id: checkout
+    title: Add authenticated Stripe checkout
+    instructions:
+      - Add an authenticated App Router endpoint that creates Stripe Checkout sessions.
+      - Reuse the existing Supabase user identity and persist the Stripe customer mapping.
+      - Validate requested price identifiers against the server-side allowlist; never trust a client-supplied amount or arbitrary price.
+    dependsOn:
+      - subscription-schema
+    targets:
+      - server-route
+      - user-identity
+      - database-schema
+    creates:
+      - checkout-route
+    verification:
+      - id: checkout-tests
+        executable: npm
+        args:
+          - test
+          - --
+          - checkout
+
+  - id: webhook
+    title: Add an idempotent Stripe webhook
+    instructions:
+      - Add an App Router webhook endpoint that verifies the raw request signature before processing events.
+      - Persist processed event identity or use an equivalent transaction-safe strategy so replayed and out-of-order events are idempotent.
+      - Apply the selected cancellation behavior when synchronizing entitlement state.
+    dependsOn:
+      - subscription-schema
+    targets:
+      - server-route
+      - database-schema
+    creates:
+      - webhook-route
+      - entitlement-service
+    verification:
+      - id: webhook-tests
+        executable: npm
+        args:
+          - test
+          - --
+          - webhook
+
+  - id: verify
+    title: Verify subscription billing end to end
+    instructions:
+      - Verify checkout, webhook signature handling, event replay, entitlement changes, and cancellation behavior.
+      - Confirm existing authentication and database flows still pass their tests.
+    dependsOn:
+      - checkout
+      - webhook
+    creates:
+      - acceptance-tests
+    verification:
+      - id: subscription-tests
+        executable: npm
+        args:
+          - test
+          - --
+          - subscriptions
+
+acceptance:
+  - id: application-build
+    executable: npm
+    args:
+      - run
+      - build
+  - id: subscription-acceptance
+    executable: npm
+    args:
+      - test
+      - --
+      - subscriptions

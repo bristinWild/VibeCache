@@ -1,0 +1,17 @@
+{
+  "id": "next-supabase-prisma",
+  "type": "repository",
+  "title": "Next Supabase Prisma fixture repository",
+  "content": "A TypeScript Next.js App Router repository using Supabase authentication and Prisma with PostgreSQL.",
+  "metadata": {
+    "language": "TypeScript",
+    "entryPoint": "src/app/layout.tsx",
+    "framework": "Next.js App Router"
+  },
+  "tags": ["repository", "nextjs", "supabase", "prisma"],
+  "relationships": [
+    "file:src/app/api/billing/route.ts",
+    "file:src/lib/supabase/server.ts",
+    "file:src/lib/prisma.ts"
+  ]
+}

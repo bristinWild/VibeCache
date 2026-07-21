@@ -1,0 +1,11 @@
+{
+  "id": "package:@prisma/client",
+  "type": "package",
+  "title": "@prisma/client",
+  "content": "Generated Prisma client for typed PostgreSQL database access.",
+  "metadata": {
+    "package": "@prisma/client"
+  },
+  "tags": ["package", "database", "prisma"],
+  "relationships": ["file:src/lib/prisma.ts"]
+}

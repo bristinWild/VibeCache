@@ -1,0 +1,12 @@
+{
+  "id": "file:src/app/layout.tsx",
+  "type": "file",
+  "title": "src/app/layout.tsx",
+  "content": "Root layout and entry point for the Next.js App Router application.",
+  "metadata": {
+    "path": "src/app/layout.tsx",
+    "role": "application-shell"
+  },
+  "tags": ["nextjs", "app-router", "entry-point"],
+  "relationships": ["next-supabase-prisma"]
+}

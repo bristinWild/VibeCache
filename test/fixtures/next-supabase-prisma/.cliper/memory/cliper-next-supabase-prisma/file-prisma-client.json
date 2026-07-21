@@ -1,0 +1,12 @@
+{
+  "id": "file:src/lib/prisma.ts",
+  "type": "file",
+  "title": "src/lib/prisma.ts",
+  "content": "Exports the shared Prisma client for PostgreSQL access from server-side modules.",
+  "metadata": {
+    "role": "database-client",
+    "database": "PostgreSQL"
+  },
+  "tags": ["database", "prisma", "postgresql"],
+  "relationships": ["package:@prisma/client"]
+}

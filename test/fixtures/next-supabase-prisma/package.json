@@ -1,0 +1,12 @@
+{
+  "name": "next-supabase-prisma-fixture",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@prisma/client": "6.12.0",
+    "@supabase/supabase-js": "2.52.1",
+    "next": "15.4.2",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  }
+}

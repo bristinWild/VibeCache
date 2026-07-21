@@ -1,0 +1,16 @@
+{
+  "id": "src/app/api/billing/route.ts",
+  "type": "architecture",
+  "title": "Billing API route architecture",
+  "content": "The Next.js App Router billing endpoint authenticates with Supabase before reading subscription data through Prisma.",
+  "metadata": {
+    "module": "billing-api",
+    "route": "/api/billing"
+  },
+  "tags": ["architecture", "billing", "server-route"],
+  "relationships": [
+    "file:src/app/api/billing/route.ts",
+    "file:src/lib/supabase/server.ts",
+    "file:src/lib/prisma.ts"
+  ]
+}

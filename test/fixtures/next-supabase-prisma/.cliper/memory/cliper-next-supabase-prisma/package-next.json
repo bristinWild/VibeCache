@@ -1,0 +1,11 @@
+{
+  "id": "package:next",
+  "type": "package",
+  "title": "next",
+  "content": "Next.js application framework with App Router support.",
+  "metadata": {
+    "package": "next"
+  },
+  "tags": ["package", "framework", "nextjs"],
+  "relationships": []
+}

@@ -1,0 +1,12 @@
+{
+  "id": "src/lib/supabase/server.ts",
+  "type": "architecture",
+  "title": "Server authentication boundary",
+  "content": "Server routes obtain the signed-in user through the shared Supabase server client.",
+  "metadata": {
+    "module": "authentication",
+    "provider": "Supabase"
+  },
+  "tags": ["architecture", "authentication", "supabase"],
+  "relationships": ["file:src/lib/supabase/server.ts"]
+}

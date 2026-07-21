@@ -1,0 +1,13 @@
+{
+  "id": "file:prisma/schema.prisma",
+  "type": "file",
+  "title": "prisma/schema.prisma",
+  "content": "Prisma schema defining application data models backed by PostgreSQL.",
+  "metadata": {
+    "path": "prisma/schema.prisma",
+    "role": "database-schema",
+    "database": "PostgreSQL"
+  },
+  "tags": ["database", "prisma", "schema", "postgresql"],
+  "relationships": ["package:@prisma/client"]
+}

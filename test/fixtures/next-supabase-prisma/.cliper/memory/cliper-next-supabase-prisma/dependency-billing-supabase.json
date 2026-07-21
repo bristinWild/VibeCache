@@ -1,0 +1,15 @@
+{
+  "id": "src/app/api/billing/route.ts->src/lib/supabase/server.ts",
+  "type": "dependency",
+  "title": "Billing route imports Supabase server client",
+  "content": "src/app/api/billing/route.ts imports src/lib/supabase/server.ts to authenticate the current user.",
+  "metadata": {
+    "from": "src/app/api/billing/route.ts",
+    "to": "src/lib/supabase/server.ts"
+  },
+  "tags": ["dependency", "authentication", "supabase"],
+  "relationships": [
+    "file:src/app/api/billing/route.ts",
+    "file:src/lib/supabase/server.ts"
+  ]
+}

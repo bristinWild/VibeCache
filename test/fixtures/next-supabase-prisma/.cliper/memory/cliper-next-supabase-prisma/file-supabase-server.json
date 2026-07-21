@@ -1,0 +1,12 @@
+{
+  "id": "file:src/lib/supabase/server.ts",
+  "type": "file",
+  "title": "src/lib/supabase/server.ts",
+  "content": "Creates the Supabase server client used to authenticate Next.js App Router requests.",
+  "metadata": {
+    "framework": "Next.js App Router",
+    "role": "server-auth-client"
+  },
+  "tags": ["authentication", "supabase", "server"],
+  "relationships": ["package:@supabase/supabase-js"]
+}
