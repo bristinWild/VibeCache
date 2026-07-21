@@ -203,16 +203,45 @@ export function createCli(
       io.out(renderFingerprint(fingerprint));
     });
 
+  const mcp = program
+    .command('mcp')
+    .description('Configure VibeCache MCP integrations.');
+  mcp
+    .command('setup')
+    .argument('[agent]', 'Agent to configure.', 'codex')
+    .action((agent: string) => {
+      if (agent !== 'codex') {
+        throw new Error(
+          `Unsupported MCP agent "${agent}". Supported agents: codex.`,
+        );
+      }
+      io.out(
+        [
+          'Add this server to Codex MCP settings:',
+          '',
+          '[mcp_servers.vibecache]',
+          'command = "vibe-mcp"',
+          '',
+          'Then restart Codex and ask: "Use Vibe and add a dark theme."',
+          '',
+        ].join('\n'),
+      );
+    });
+
   program
     .command('add')
     .description('Plan or execute a feature capsule for a repository.')
     .argument('<feature>', 'Feature capsule id.')
     .option('--path <path>', 'Repository path.', '.')
+    .option(
+      '--request <request>',
+      'Describe the requested change for the agent.',
+    )
     .option('--dry-run', 'Generate a plan without changing repository files.')
     .addOption(
       new Option(
         '--agent <agent>',
-        'Execute the plan with a coding agent.',
+        'Execute the plan with a coding agent (Codex is the default).',
       ).choices(['codex']),
     )
     .option('--yes', 'Skip the interactive execution confirmation.')
@@ -232,6 +261,7 @@ export function createCli(
         featureId: string,
         options: {
           path: string;
+          request?: string;
           dryRun?: boolean;
           agent?: 'codex';
           yes?: boolean;
@@ -240,21 +270,22 @@ export function createCli(
           answer: string[];
         },
       ) => {
-        if (Boolean(options.dryRun) === Boolean(options.agent)) {
-          throw new Error(
-            'Choose exactly one mode: --dry-run or --agent codex.',
-          );
+        if (options.dryRun && options.agent) {
+          throw new Error('Choose one mode: --dry-run or agent execution.');
         }
-        if (options.yes && !options.agent) {
-          throw new Error('--yes is only valid with --agent codex.');
+        if (options.yes && options.dryRun) {
+          throw new Error('--yes is only valid with agent execution.');
         }
-        if (options.allowDirty && !options.agent) {
-          throw new Error('--allow-dirty is only valid with --agent codex.');
+        if (options.allowDirty && options.dryRun) {
+          throw new Error('--allow-dirty is only valid with agent execution.');
         }
 
         const input: PlanFeatureInput = {
           featureId,
           repositoryPath: resolve(options.path),
+          ...(options.request?.trim()
+            ? { request: options.request.trim() }
+            : {}),
           answers: parseAnswers(options.answer),
         };
         const plan = await services.planFeature.execute(input);

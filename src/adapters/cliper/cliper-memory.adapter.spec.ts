@@ -142,9 +142,12 @@ describe('CliperMemoryAdapter', () => {
   });
 
   it('explains how to initialize a repository with missing metadata', async () => {
-    const adapter = new CliperMemoryAdapter({
-      searchStructured: jest.fn(),
-    });
+    const adapter = new CliperMemoryAdapter(
+      {
+        searchStructured: jest.fn(),
+      },
+      { autoInitialize: false },
+    );
     const existingDirectoryWithoutMemory = join(fixtureRoot, 'src');
 
     const error = await captureCliperError(

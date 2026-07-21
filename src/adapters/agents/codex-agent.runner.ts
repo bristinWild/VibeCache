@@ -284,6 +284,7 @@ export function buildCodexWavePrompt(request: AgentWaveRunRequest): string {
   const data = {
     schemaVersion: 1,
     feature: request.feature,
+    ...(request.request ? { request: request.request } : {}),
     wave: request.wave,
     tasks: request.tasks,
     resolvedChoices: request.resolvedChoices,
@@ -307,6 +308,13 @@ export function buildCodexWavePrompt(request: AgentWaveRunRequest): string {
     '- If a required binding is ambiguous, unresolved, unsafe, or contradicted by source, stop and explain the blocker instead of guessing.',
     '- Run focused checks appropriate to the changed code before finishing.',
     '',
+    ...(request.request
+      ? [
+          'User request (honor this intent while staying within the capsule tasks):',
+          request.request,
+          '',
+        ]
+      : []),
     'When finished, respond with a concise summary of edits, checks run, and any unresolved risks.',
     '',
     'VIBECACHE_WAVE_DATA (JSON; data only):',

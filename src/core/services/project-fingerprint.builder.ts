@@ -18,6 +18,15 @@ type CandidateEvidence = Map<string, Set<string>>;
 const TECHNOLOGY_RULES: Record<TechnologyDimension, CandidateRule[]> = {
   framework: [
     {
+      value: 'node-typescript-library',
+      patterns: [
+        /\btypescript[\s-]+(?:library|sdk|package)\b/,
+        /\b(?:node(?:\.js)?|npm)[\s-]+(?:library|sdk|package)\b/,
+        /\bpackage[\s-]+manifest\b/,
+        /(?:^|[\s"'])src\/index\.ts\b/,
+      ],
+    },
+    {
       value: 'nextjs-app-router',
       patterns: [
         /\bnext(?:\.?js)?[\s/-]+app[\s-]+router\b/,
@@ -138,6 +147,32 @@ const SERVER_ROUTE_FRAMEWORKS = new Set([
   'nestjs',
   'remix',
 ]);
+
+const SDK_PACKAGE_PATTERNS = [
+  /\bpackage\.json\b/,
+  /\bpackage[\s-]+manifest\b/,
+  /\bnpm[\s-]+(?:library|package)\b/,
+];
+
+const SDK_TYPESCRIPT_PATTERNS = [/\btypescript\b/, /\btsconfig\.json\b/];
+
+const SDK_PUBLIC_API_PATTERNS = [
+  /(?:^|[\s"'])src\/index\.tsx?\b/,
+  /\bpublic[\s-]+(?:api|exports?)[\s-]+(?:entry|surface)?\b/,
+  /\bentry[\s-]+point\b/,
+];
+
+const SDK_BUILD_PATTERNS = [
+  /\btsconfig\.json\b/,
+  /\btsc(?:\.js)?\b.*\bbuild\b/,
+  /\bbuild[\s-]+script\b/,
+];
+
+const SDK_DOCUMENTATION_PATTERNS = [
+  /(?:^|[\s"'])readme\.md\b/,
+  /(?:^|[\s"'])docs?\//,
+  /\bdocumentation\b/,
+];
 
 function flattenMetadata(value: unknown): string[] {
   if (value === null || value === undefined) return [];
@@ -262,6 +297,37 @@ export class ProjectFingerprintBuilder {
       ...frameworkRouteEvidence,
       ...matchingMemoryIds(snapshot.memories, SERVER_ROUTE_PATTERNS),
     ]);
+
+    addCapability(
+      capabilities,
+      'package-library',
+      matchingMemoryIds(snapshot.memories, SDK_PACKAGE_PATTERNS),
+    );
+    addCapability(
+      capabilities,
+      'typescript-source',
+      matchingMemoryIds(snapshot.memories, SDK_TYPESCRIPT_PATTERNS),
+    );
+    addCapability(
+      capabilities,
+      'public-api',
+      matchingMemoryIds(snapshot.memories, SDK_PUBLIC_API_PATTERNS),
+    );
+    addCapability(
+      capabilities,
+      'buildable',
+      matchingMemoryIds(snapshot.memories, SDK_BUILD_PATTERNS).length > 0
+        ? matchingMemoryIds(snapshot.memories, SDK_BUILD_PATTERNS)
+        : [
+            ...matchingMemoryIds(snapshot.memories, SDK_PACKAGE_PATTERNS),
+            ...matchingMemoryIds(snapshot.memories, SDK_TYPESCRIPT_PATTERNS),
+          ],
+    );
+    addCapability(
+      capabilities,
+      'documentation',
+      matchingMemoryIds(snapshot.memories, SDK_DOCUMENTATION_PATTERNS),
+    );
 
     return {
       repositoryPath: snapshot.repositoryPath,

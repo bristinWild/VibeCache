@@ -31,6 +31,7 @@ export type AgentSemanticBinding =
 
 export interface AgentWaveRunRequest {
   repositoryPath: string;
+  request?: string;
   feature: {
     id: string;
     version: string;

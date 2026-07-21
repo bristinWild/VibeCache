@@ -65,8 +65,34 @@ describe('createCli', () => {
       'resume',
       'list',
       'inspect',
+      'mcp',
       'add',
     ]);
+  });
+
+  it('defaults to confirmed Codex execution when no mode flag is provided', async () => {
+    const executeFeature = jest.fn().mockResolvedValue({
+      status: 'installed',
+      run: { runId: 'run-1' },
+      receipt: { featureId: 'dark-theme' },
+    });
+    const confirm = jest.fn().mockResolvedValue(false);
+    const cli = createCli(
+      {
+        inspectProject: { execute: jest.fn() },
+        planFeature: { execute: jest.fn().mockResolvedValue(executablePlan()) },
+        executeFeature: { execute: executeFeature },
+        registry: { list: jest.fn() },
+        runs: { list: jest.fn(), read: jest.fn() },
+        confirmation: { confirm },
+      },
+      { out: jest.fn(), err: jest.fn() },
+    );
+
+    await cli.parseAsync(['node', 'vibe', 'add', 'dark-theme']);
+
+    expect(confirm).toHaveBeenCalledTimes(1);
+    expect(executeFeature).not.toHaveBeenCalled();
   });
 
   it('surfaces unanswered product choices and unresolved repository bindings', async () => {

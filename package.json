@@ -1,10 +1,25 @@
 {
   "name": "vibecache",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Compile and safely execute verified feature capsules against Cliper repository memory.",
   "author": "Bristin Borah",
-  "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bristinWild/VibeCache.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bristinWild/VibeCache/issues"
+  },
+  "homepage": "https://github.com/bristinWild/VibeCache#readme",
+  "keywords": [
+    "coding-agent",
+    "codex",
+    "mcp",
+    "cliper",
+    "developer-tools",
+    "vibecoding"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -21,7 +36,8 @@
     "README.md"
   ],
   "bin": {
-    "vibe": "dist/cli.js"
+    "vibe": "dist/cli.js",
+    "vibe-mcp": "dist/mcp.js"
   },
   "engines": {
     "node": "^22.13.0 || >=24.0.0"
@@ -33,6 +49,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:cli": "ts-node src/cli.ts",
+    "start:mcp": "ts-node src/mcp.ts",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,test}/**/*.ts\"",

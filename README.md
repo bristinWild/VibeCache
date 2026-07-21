@@ -12,14 +12,14 @@ shadcn installs a UI component
 VibeCache installs a product capability
 ```
 
-> **MVP status:** VibeCache is currently an unreleased, private local-development
-> project. Its grounded planning flow works, while Codex execution is
-> experimental. A real Stripe installation performed by the real Codex CLI has
-> not yet been validated end to end.
+> **MVP status:** VibeCache is an early public release. The grounded planning,
+> MCP, and Codex execution flows are experimental and should be reviewed before
+> using them on production repositories.
 
-The first capsule is `stripe-subscriptions`. It can produce a repository-specific
-dry-run plan and can attempt that plan wave-by-wave with a locally authenticated
-Codex CLI.
+The first capsules include `stripe-subscriptions`, `dark-theme`,
+`wallet-connect-tab`, and `sdk-feature`. VibeCache can produce a
+repository-specific plan and can attempt that plan wave-by-wave with a locally
+authenticated Codex CLI.
 
 ## How it works
 
@@ -67,7 +67,34 @@ vibe add stripe-subscriptions \
 ```
 
 Use `--json` to inspect all question metadata, evidence IDs, and binding states.
-No slash command is required.
+No slash command is required for the CLI flow.
+
+## Codex MCP flow
+
+For the conversational workflow, register the bundled `vibe-mcp` executable as
+a local stdio MCP server in Codex. It exposes one tool, `vibe_plan`:
+
+```text
+Use Vibe and add a dark theme to this project.
+```
+
+Codex calls `vibe_plan`, receives the capsule tasks, Cliper evidence, grounded
+paths, product choices, and verification commands, then performs the edits in
+the active Codex session. VibeCache does not start a nested coding agent for
+this MCP flow.
+
+Build and link the local checkout before registering the server:
+
+```bash
+cd /path/to/vibecache
+npm install
+npm run build
+npm link
+```
+
+Register the `vibe-mcp` command in Codex's MCP settings, then restart Codex so
+the tool is discovered. The MCP server uses the current project directory by
+default; it can also receive an explicit `repositoryPath`.
 
 ## Prerequisites
 
@@ -75,16 +102,19 @@ The complete workflow uses:
 
 - Node.js `^22.13.0` or `>=24.0.0` and npm;
 - Git for the later execution workflow;
-- the separate Cliper CLI;
+- the separate Cliper CLI (optional when VibeCache bootstraps local JSON);
 - local JSON memory generated for the target repository.
 
-Install Cliper separately if `cliper --version` is not available:
+VibeCache handles this setup automatically for its CLI and MCP flows. It
+enables Cliper's local JSON provider before first initialization, so new users
+do not need to authenticate manually. If you want to use the Cliper CLI
+directly, install it separately:
 
 ```bash
 npm install --global cliper-memory
 ```
 
-Configure local JSON storage once per machine:
+Configure local JSON storage manually only when using the Cliper CLI directly:
 
 ```bash
 cliper auth local-json
@@ -102,7 +132,10 @@ cliper sync
 ```
 
 VibeCache consumes the generated `.cliper/metadata.json` and local JSON memory.
-It does not recreate Cliper scanning or run `cliper sync` automatically.
+If a repository has no Cliper metadata or searchable local memory, VibeCache
+automatically enables the local JSON provider and initializes memory through its
+bundled `cliper-memory` SDK. It never registers the repository with a remote
+service during this bootstrap.
 
 Execution additionally requires:
 
@@ -123,7 +156,7 @@ codex login
 Install and link this checkout:
 
 ```bash
-cd /Users/bristinborah/vibecache
+cd /path/to/vibecache
 nvm use
 npm install
 npm run build
@@ -142,7 +175,7 @@ vibe add stripe-subscriptions --dry-run
 Review and resolve every compatibility issue, question, binding, task, and
 verification command before considering execution.
 
-## Future published flow
+## Published installation
 
 Once the package is public, the intended installation will be:
 
@@ -150,8 +183,7 @@ Once the package is public, the intended installation will be:
 npm install --global vibecache
 ```
 
-That command is documentation for the future distribution flow, not a currently
-published package. The current `package.json` deliberately remains private.
+This installs both the `vibe` CLI and the `vibe-mcp` MCP server command.
 
 ## Dry-run fixture
 

@@ -1,6 +1,13 @@
 import { Inject, Injectable, Optional } from '@nestjs/common';
 import { Cliper } from 'cliper-memory';
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
+import { homedir } from 'node:os';
 import { isAbsolute, join } from 'node:path';
 import {
   ProjectMemoryPort,
@@ -31,6 +38,11 @@ interface CliperSearchRequest {
 
 export interface CliperStructuredSearchClient {
   searchStructured(options: CliperSearchRequest): Promise<unknown>;
+}
+
+interface CliperMemoryAdapterOptions {
+  /** Automatically create local JSON Cliper memory when a repository has none. */
+  autoInitialize?: boolean;
 }
 
 export const CLIPER_SEARCH_CLIENT = Symbol('CLIPER_SEARCH_CLIENT');
@@ -75,12 +87,28 @@ export class CliperMemoryAdapter implements ProjectMemoryPort {
     @Optional()
     @Inject(CLIPER_SEARCH_CLIENT)
     client?: CliperStructuredSearchClient,
+    @Optional()
+    private readonly options: CliperMemoryAdapterOptions = {},
   ) {
     this.client = client ?? new Cliper();
   }
 
   async inspect(repositoryPath: string): Promise<RepositoryMemorySnapshot> {
-    const metadata = this.validateRepository(repositoryPath);
+    let metadata: CliperMetadata;
+    try {
+      metadata = this.validateRepository(repositoryPath);
+    } catch (error) {
+      if (
+        this.options.autoInitialize !== false &&
+        error instanceof CliperMemoryError &&
+        error.code === 'MEMORY_NOT_INITIALIZED'
+      ) {
+        await this.initializeLocalMemory(repositoryPath);
+        metadata = this.validateRepository(repositoryPath);
+      } else {
+        throw error;
+      }
+    }
 
     let results: unknown[];
 
@@ -103,7 +131,21 @@ export class CliperMemoryAdapter implements ProjectMemoryPort {
       );
     }
 
-    const memories = this.normalizeAndDedupe(results);
+    let memories = this.normalizeAndDedupe(results);
+
+    if (memories.length === 0 && this.options.autoInitialize !== false) {
+      await this.initializeLocalMemory(repositoryPath);
+      results = await Promise.all(
+        FOCUSED_SEARCHES.map(({ profile, query }) =>
+          this.client.searchStructured({
+            path: repositoryPath,
+            query,
+            profile,
+          }),
+        ),
+      );
+      memories = this.normalizeAndDedupe(results);
+    }
 
     if (memories.length === 0) {
       throw new CliperMemoryError(
@@ -121,6 +163,25 @@ export class CliperMemoryAdapter implements ProjectMemoryPort {
         ...(metadata.generatedAt ? { generatedAt: metadata.generatedAt } : {}),
       },
     };
+  }
+
+  private async initializeLocalMemory(repositoryPath: string): Promise<void> {
+    enableLocalJsonProvider();
+    const cliper = new Cliper();
+    const log = console.log;
+    const warn = console.warn;
+    console.log = () => {};
+    console.warn = () => {};
+    try {
+      await cliper.init({
+        path: repositoryPath,
+        register: false,
+        providers: ['local-json'],
+      });
+    } finally {
+      console.log = log;
+      console.warn = warn;
+    }
   }
 
   private validateRepository(repositoryPath: string): CliperMetadata {
@@ -259,6 +320,34 @@ function isRepositoryMemoryType(value: unknown): value is RepositoryMemoryType {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Cliper's local-json provider is intentionally opt-in. VibeCache enables it
+ * non-interactively for automatic first-run bootstrap while preserving any
+ * existing provider settings.
+ */
+function enableLocalJsonProvider(): void {
+  const configDir = join(homedir(), '.cliper');
+  const configPath = join(configDir, 'config.json');
+  let config: Record<string, unknown> = {};
+
+  if (existsSync(configPath)) {
+    try {
+      const parsed: unknown = JSON.parse(readFileSync(configPath, 'utf8'));
+      if (isRecord(parsed)) config = parsed;
+    } catch {
+      config = {};
+    }
+  }
+
+  const current = isRecord(config.localJson) ? config.localJson : {};
+  config.localJson = { ...current, enabled: true };
+  mkdirSync(configDir, { recursive: true });
+  writeFileSync(configPath, JSON.stringify(config, null, 2), {
+    encoding: 'utf8',
+    mode: 0o600,
+  });
 }
 
 function isNonEmptyString(value: unknown): value is string {

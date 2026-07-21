@@ -27,6 +27,7 @@ export interface FeaturePlan {
     fingerprint: ProjectFingerprint;
   };
   feature: Pick<Capsule, 'id' | 'version' | 'name' | 'summary' | 'provides'>;
+  request?: string;
   compatibility: CompatibilityResult;
   questions: PlannedQuestion[];
   bindings: SemanticBinding[];

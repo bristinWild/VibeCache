@@ -192,4 +192,47 @@ describe('ProjectFingerprintBuilder', () => {
       { id: 'server-routes', evidenceIds: ['file:api'] },
     ]);
   });
+
+  it('detects a TypeScript SDK and its package capabilities', () => {
+    const fingerprint = builder.build({
+      repositoryPath: '/workspace/sdk',
+      memories: [
+        memory('file:package', {
+          type: 'file',
+          metadata: { path: 'package.json' },
+          content: 'NPM package manifest with a TypeScript build script.',
+        }),
+        memory('file:index', {
+          type: 'file',
+          metadata: { path: 'src/index.ts' },
+          content: 'Public API entry point for the TypeScript SDK.',
+        }),
+        memory('file:tsconfig', {
+          type: 'file',
+          metadata: { path: 'tsconfig.json' },
+        }),
+        memory('file:readme', {
+          type: 'file',
+          metadata: { path: 'README.md' },
+          content: 'SDK usage documentation.',
+        }),
+      ],
+    });
+
+    expect(fingerprint.framework).toEqual({
+      status: 'detected',
+      value: 'node-typescript-library',
+      evidenceIds: ['file:index', 'file:package'],
+    });
+    expect(fingerprint.capabilities).toEqual([
+      { id: 'package-library', evidenceIds: ['file:package'] },
+      {
+        id: 'typescript-source',
+        evidenceIds: ['file:index', 'file:package', 'file:tsconfig'],
+      },
+      { id: 'public-api', evidenceIds: ['file:index'] },
+      { id: 'buildable', evidenceIds: ['file:package', 'file:tsconfig'] },
+      { id: 'documentation', evidenceIds: ['file:readme'] },
+    ]);
+  });
 });

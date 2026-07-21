@@ -161,6 +161,7 @@ export const FeatureRunSchema = z
     schemaVersion: z.literal(FEATURE_RUN_SCHEMA_VERSION),
     runId: z.string().regex(FEATURE_RUN_ID_PATTERN),
     featureId: IdentifierSchema,
+    request: NonEmptyStringSchema.optional(),
     capsule: z
       .object({
         id: IdentifierSchema,

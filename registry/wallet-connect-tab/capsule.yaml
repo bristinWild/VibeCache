@@ -1,0 +1,84 @@
+schemaVersion: 1
+id: wallet-connect-tab
+version: 0.1.0
+name: WalletConnect tab
+summary: Adds a secure WalletConnect entry point to an existing TypeScript web project.
+
+provides:
+  - wallet-connect-entry
+  - wallet-navigation-tab
+
+requires:
+  - capability: typescript-source
+  - capability: buildable
+
+questions:
+  - id: tab-label
+    prompt: What label should the new navigation tab use?
+    type: text
+    default: Wallet
+
+  - id: supported-network
+    prompt: Which initial network should the wallet entry target?
+    type: select
+    options:
+      - ethereum
+      - polygon
+      - base
+    default: ethereum
+
+tasks:
+  - id: map-navigation-boundary
+    title: Map the navigation and client boundaries
+    instructions:
+      - Read the grounded Cliper memory and verify the relevant source files before editing.
+      - Identify the shared navigation component, route conventions, global providers, and client-only boundaries.
+      - Check whether the project already uses a wallet library or provider before adding dependencies.
+    targets:
+      - source-root
+    creates:
+      - wallet-navigation-boundary
+
+  - id: implement-wallet-tab
+    title: Add the WalletConnect tab and entry route
+    instructions:
+      - Add the requested navigation tab using the project's existing component and routing conventions.
+      - Create a focused wallet entry view that connects through WalletConnect only on the client side.
+      - Keep the WalletConnect project identifier in an environment variable and add a safe example entry without real credentials.
+      - Handle disconnected, connecting, connected, rejected, and unsupported-network states accessibly.
+      - Never request signing or transaction approval merely to display the wallet entry point.
+    dependsOn:
+      - map-navigation-boundary
+    targets:
+      - source-root
+    creates:
+      - wallet-connect-tab
+      - wallet-entry-route
+      - wallet-configuration
+
+  - id: verify-wallet-tab
+    title: Verify navigation and wallet states
+    instructions:
+      - Verify the new tab does not break existing navigation or route rendering.
+      - Verify the disconnected state works without wallet extensions or credentials present.
+      - Add focused tests using the repository's existing conventions when they exist.
+      - Run the existing build and test checks; do not download tools dynamically during verification.
+    dependsOn:
+      - implement-wallet-tab
+    targets:
+      - source-root
+    creates:
+      - wallet-acceptance-tests
+    verification:
+      - id: project-build
+        executable: npm
+        args:
+          - run
+          - build
+
+acceptance:
+  - id: portfolio-build
+    executable: npm
+    args:
+      - run
+      - build

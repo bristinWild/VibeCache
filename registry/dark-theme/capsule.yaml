@@ -1,0 +1,77 @@
+schemaVersion: 1
+id: dark-theme
+version: 0.1.0
+name: Dark theme
+summary: Adds an accessible, persistent dark theme to an existing TypeScript web project.
+
+provides:
+  - dark-theme
+  - theme-preference
+
+requires:
+  - capability: typescript-source
+  - capability: buildable
+
+questions:
+  - id: theme-mode
+    prompt: How should the initial theme preference be selected?
+    type: select
+    options:
+      - system-first
+      - dark-first
+    default: system-first
+
+tasks:
+  - id: audit-theme-surface
+    title: Map the existing visual and layout system
+    instructions:
+      - Read the grounded Cliper memory and verify the relevant source files before editing.
+      - Identify the shared layout, global styles, design tokens, and client/server boundaries.
+      - Reuse the project's existing styling approach instead of introducing a second styling system.
+      - Check for existing color variables, theme providers, user preference storage, and prefers-color-scheme support.
+    targets:
+      - source-root
+    creates:
+      - theme-boundary
+
+  - id: implement-dark-theme
+    title: Implement the dark theme
+    instructions:
+      - Add a coherent dark color palette with sufficient contrast for text, controls, links, borders, and surfaces.
+      - "Follow the selected theme mode: honor the operating-system preference for system-first, or make dark the initial preference for dark-first."
+      - Keep the existing light theme intact and avoid flashes of the wrong theme during initial render when the framework supports prevention.
+      - Add a keyboard-accessible theme toggle in the established shared UI location when one exists.
+    dependsOn:
+      - audit-theme-surface
+    targets:
+      - source-root
+    creates:
+      - dark-theme-styles
+      - theme-toggle
+
+  - id: verify-theme
+    title: Verify theme behavior and visual safety
+    instructions:
+      - Verify both light and dark modes across the primary portfolio routes and responsive layouts.
+      - Check keyboard focus, reduced-motion behavior, readable contrast, and persistence across reloads when persistence exists.
+      - Update the project's documentation only if it documents local development or visual conventions.
+      - Run the existing build and test checks; do not download tools dynamically during verification.
+    dependsOn:
+      - implement-dark-theme
+    targets:
+      - source-root
+    creates:
+      - theme-acceptance-tests
+    verification:
+      - id: project-build
+        executable: npm
+        args:
+          - run
+          - build
+
+acceptance:
+  - id: portfolio-build
+    executable: npm
+    args:
+      - run
+      - build

@@ -205,6 +205,7 @@ export class ExecuteFeatureUseCase {
             schemaVersion: FEATURE_RUN_SCHEMA_VERSION,
             runId: generateRunId(new Date(timestamp)),
             featureId: plan.feature.id,
+            ...(plan.request ? { request: plan.request } : {}),
             capsule: {
               id: plan.feature.id,
               version: plan.feature.version,
@@ -320,6 +321,7 @@ export class ExecuteFeatureUseCase {
           const agentStartedAt = now();
           const agentResult = await this.agentRunner.runWave({
             repositoryPath: plan.repository.path,
+            ...(plan.request ? { request: plan.request } : {}),
             feature: { id: plan.feature.id, version: plan.feature.version },
             wave,
             tasks: tasks.map(
@@ -717,6 +719,7 @@ function prepareResumeRun(
   }
   if (
     saved.featureId !== plan.feature.id ||
+    (saved.request ?? '') !== (plan.request ?? '') ||
     saved.capsule.version !== plan.feature.version ||
     saved.capsule.digest !== capsuleDigest ||
     saved.repository.path !== plan.repository.path

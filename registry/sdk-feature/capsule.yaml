@@ -1,0 +1,83 @@
+schemaVersion: 1
+id: sdk-feature
+version: 0.1.0
+name: Public SDK feature
+summary: Adds a maintainable TypeScript SDK capability while preserving its package boundary and documentation.
+
+provides:
+  - sdk-feature
+  - public-api-change
+
+compatibility:
+  - dimension: framework
+    oneOf:
+      - node-typescript-library
+
+requires:
+  - capability: package-library
+  - capability: typescript-source
+  - capability: public-api
+  - capability: buildable
+
+questions:
+  - id: export-policy
+    prompt: Should the new capability be exported from the package public API?
+    type: select
+    options:
+      - public
+      - internal
+    default: public
+
+tasks:
+  - id: map-sdk-boundary
+    title: Map the SDK module and package boundary
+    instructions:
+      - Read the grounded Cliper memory and verify the source files before editing.
+      - Identify the owning module, public entry point, package build configuration, and existing documentation conventions.
+      - Preserve the package's existing runtime, dependency, and TypeScript conventions.
+    targets:
+      - source-root
+      - public-api
+    creates:
+      - sdk-module
+
+  - id: implement-capability
+    title: Implement the SDK capability
+    instructions:
+      - Implement the requested capability in the module identified during the architecture pass.
+      - Keep the implementation deterministic, typed, and safe for both source and compiled package consumers.
+      - Do not expose internal implementation details unless the export policy is public.
+    dependsOn:
+      - map-sdk-boundary
+    targets:
+      - source-root
+      - public-api
+    creates:
+      - sdk-feature
+
+  - id: document-and-verify
+    title: Document and verify the package change
+    instructions:
+      - Update the repository's README or documentation with the new usage and compatibility expectations.
+      - Add or update focused tests using the repository's existing test conventions when they exist.
+      - Run the existing build check; run lint only when the repository already has a configured lint script.
+    dependsOn:
+      - implement-capability
+    targets:
+      - public-api
+    creates:
+      - api-docs
+      - acceptance-tests
+    verification:
+      - id: sdk-build
+        executable: npm
+        args:
+          - run
+          - build
+
+acceptance:
+  - id: package-build
+    executable: npm
+    args:
+      - run
+      - build

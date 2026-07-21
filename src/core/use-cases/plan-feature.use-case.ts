@@ -18,6 +18,7 @@ import { TaskGraphCompiler } from '../services/task-graph.compiler';
 export interface PlanFeatureInput {
   featureId: string;
   repositoryPath: string;
+  request?: string;
   answers?: Record<string, CapsuleAnswer>;
 }
 
@@ -99,6 +100,7 @@ export class PlanFeatureUseCase {
         summary: capsule.summary,
         provides: capsule.provides,
       },
+      ...(input.request?.trim() ? { request: input.request.trim() } : {}),
       compatibility,
       questions,
       bindings,

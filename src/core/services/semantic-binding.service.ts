@@ -96,6 +96,72 @@ export class SemanticBindingService {
 
     const searchable = searchableText(memory);
 
+    if (target === 'package-manifest') {
+      if (/^package\.json$/i.test(path)) {
+        return [{ path, score: 100, evidenceId: memory.id }];
+      }
+      if (/package\.json|package[\s-]+manifest/.test(searchable)) {
+        return [{ path, score: 70, evidenceId: memory.id }];
+      }
+    }
+
+    if (target === 'build-config') {
+      if (/^tsconfig(?:\.[^/]+)?\.json$/i.test(path)) {
+        return [{ path, score: 100, evidenceId: memory.id }];
+      }
+      if (/tsconfig\.json|typescript compiler/.test(searchable)) {
+        return [{ path, score: 70, evidenceId: memory.id }];
+      }
+    }
+
+    if (target === 'public-api') {
+      if (/^(?:src\/)?index\.[cm]?[jt]sx?$/i.test(path)) {
+        return [{ path, score: 100, evidenceId: memory.id }];
+      }
+      if (/public[\s-]+(?:api|exports?)|entry[\s-]+point/.test(searchable)) {
+        return [{ path, score: 70, evidenceId: memory.id }];
+      }
+    }
+
+    if (target === 'source-root') {
+      const sourceMatch = path.match(
+        /^(src|lib|packages|app|pages|components)(?:\/|$)/i,
+      );
+      if (sourceMatch) {
+        return [
+          {
+            path: sourceMatch[1],
+            score: /^(app|pages)$/i.test(sourceMatch[1]) ? 100 : 90,
+            evidenceId: memory.id,
+          },
+        ];
+      }
+      if (/source[\s-]+(?:root|directory)|typescript source/.test(searchable)) {
+        return [{ path, score: 60, evidenceId: memory.id }];
+      }
+    }
+
+    if (target === 'documentation') {
+      if (/^(?:readme\.md|docs?(?:\/|$))/i.test(path)) {
+        return [{ path, score: 100, evidenceId: memory.id }];
+      }
+      if (/documentation|readme\.md/.test(searchable)) {
+        return [{ path, score: 70, evidenceId: memory.id }];
+      }
+    }
+
+    if (target === 'test-suite') {
+      if (
+        /(?:^|\/)(?:test|tests|__tests__|spec)(?:\/|$)/i.test(path) ||
+        /\.(?:spec|test)\.[cm]?[jt]sx?$/i.test(path)
+      ) {
+        return [{ path, score: 100, evidenceId: memory.id }];
+      }
+      if (/test suite|automated tests?/.test(searchable)) {
+        return [{ path, score: 60, evidenceId: memory.id }];
+      }
+    }
+
     if (['database-schema', 'subscription-model'].includes(target)) {
       if (/^prisma\/schema\.prisma$/i.test(path)) {
         return [{ path, score: 100, evidenceId: memory.id }];
