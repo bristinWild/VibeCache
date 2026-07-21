@@ -1,6 +1,6 @@
 {
   "name": "vibecache",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Compile and safely execute verified feature capsules against Cliper repository memory.",
   "author": "Bristin Borah",
   "license": "MIT",
